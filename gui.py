@@ -1,31 +1,40 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QLabel
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton,QLabel
 import sys
+from PyQt5.QtGui import QIcon,QFont,QPixmap
+from PyQt5.QtCore import Qt #  Qt for aligment
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("Counter App")
-        self.count = 0
+        self.setWindowTitle(" App")
+        self.setWindowIcon(QIcon("download.jpeg"))
+        self.setGeometry(700, 300, 500, 500)
 
-        central = QWidget()
-        self.setCentralWidget(central)
 
-        layout = QVBoxLayout()
 
-        self.label = QLabel("0")
-        self.button = QPushButton("Increase")
 
-        self.button.clicked.connect(self.increase)
+        label = QLabel("hiii",self)
+        label.setFont(QFont("Arial",30))
+        label.setGeometry(0,0,500,100)
+        label.setStyleSheet("color: blue;"
+                            "background-color:green;"
+                            "font-weight:bold;"
+                            "font-style:italic;"
+                            "text-decoration:underline;")
+    
+        
+        label.setAlignment(Qt.AlignCenter)
+        # Button
+        self.button = QPushButton("Click Me", self)
+        self.button.move(150, 120)
 
-        layout.addWidget(self.label)
-        layout.addWidget(self.button)
+        # Connect event
+        self.button.clicked.connect(self.on_click)
 
-        central.setLayout(layout)
-
-    def increase(self):
-        self.count += 1
-        self.label.setText(str(self.count))
+    def on_click(self):
+        print("Button clicked 🚀")
 
 
 if __name__ == "__main__":
