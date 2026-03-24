@@ -4,6 +4,10 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import csv,os
 from PyQt5.QtGui import QColor
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
 
 
 
@@ -56,6 +60,106 @@ class BookScraperApp(QMainWindow):
         self.sort_btn = QPushButton("Sort by Price")
         self.sort_btn.clicked.connect(self.sort_data)
         layout.addWidget(self.sort_btn)
+
+
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Search book...")
+        self.search_input.textChanged.connect(self.search_books)
+        layout.addWidget(self.search_input)
+
+
+
+        self.min_price = QLineEdit()
+        self.min_price.setPlaceholderText("Min Price")
+
+        self.max_price = QLineEdit()
+        self.max_price.setPlaceholderText("Max Price")
+
+        layout.addWidget(self.min_price)
+        layout.addWidget(self.max_price)
+
+        self.filter_btn = QPushButton("Filter Price")
+        self.filter_btn.clicked.connect(self.filter_price)
+        layout.addWidget(self.filter_btn)
+
+        self.export_btn = QPushButton("Export to Excel")
+        self.export_btn.clicked.connect(self.export_excel)
+        layout.addWidget(self.export_btn)
+
+
+
+        self.chart_btn = QPushButton("Show Chart")
+        self.chart_btn.clicked.connect(self.show_chart)
+        layout.addWidget(self.chart_btn)
+
+    def show_chart(self):
+     plt.close('all')
+
+     if not self.all_books:
+        self.status_label.setText("No data to plot")
+        return
+
+     titles = [book[0] for book in self.all_books]
+     prices = [float(book[1][1:]) for book in self.all_books]
+
+     colors = []
+     for book in self.all_books:
+        title, price = book
+        if hasattr(self, 'old_prices') and title in self.old_prices:
+            old_price = float(self.old_prices[title][1:])
+            new_price = float(price[1:])
+            if new_price < old_price:
+                colors.append('green')
+            else:
+                colors.append('red')
+        else:
+            colors.append('skyblue')
+
+    # ✅ These are now OUTSIDE the for loop
+     plt.figure(figsize=(12, 6))
+     bars = plt.bar(titles, prices, color=colors)
+
+     for bar in bars:
+        yval = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2, yval + 0.2,
+                 f'{yval:.2f}', ha='center', fontsize=9)
+
+     plt.xticks(rotation=45, ha="right")
+     plt.ylabel("Price (£)", fontsize=12)
+     plt.title("Book Prices (Green = Price Drop)", fontsize=16)
+     plt.grid(axis='y', linestyle='--', alpha=0.7)
+     plt.tight_layout()
+     plt.show()
+
+    def export_excel(self):
+        df = pd.DataFrame(self.all_books, columns=["Title", "Price"])
+        df.to_excel("books.xlsx", index=False)
+
+    def search_books(self):
+      text = self.search_input.text().lower()
+
+      filtered = [
+         book for book in self.all_books
+         if text in book[0].lower()
+      ] 
+
+      self.update_table(filtered)
+
+
+
+    def filter_price(self):
+     min_p = float(self.min_price.text() or 0)
+     max_p = float(self.max_price.text() or 1000)
+
+     filtered = []
+
+     for title, price in self.all_books:
+        p = float(price[1:])  # remove £
+        if min_p <= p <= max_p:
+            filtered.append([title, price])
+
+     self.update_table(filtered)
+
 
     def sort_data(self):
         self.all_books.sort(key=lambda x: float(x[1][1:]))
