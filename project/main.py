@@ -7,3 +7,6 @@ if __name__ == "__main__":
     window = ScraperApp()
     window.show()
     sys.exit(app.exec_())
+
+
+    #pyinstaller --onefile --windowed --hidden-import=selenium main.py
