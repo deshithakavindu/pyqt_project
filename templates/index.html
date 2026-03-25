@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> shelf • book catalogue</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --accent: #00ff9d;
+            --text: #f0f0f0;
+            --text-muted: #888;
+            --card: #111;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 80px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 32px;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 42px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            background: linear-gradient(90deg, #00ff9d, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: var(--text-muted);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .stats {
+            text-align: right;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Scrape Button */
+        .scrape-btn {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            padding: 16px 36px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scrape-btn:hover {
+            background: var(--accent);
+            color: #0a0a0a;
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 255, 157, 0.6);
+        }
+
+        .scrape-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: 0.7s;
+        }
+
+        .scrape-btn:hover::before {
+            left: 200%;
+        }
+
+        /* Table */
+        .table-container {
+            background: var(--card);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #1a1a1a;
+        }
+
+        th {
+            padding: 20px 28px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 24px 28px;
+            border-top: 1px solid #222;
+        }
+
+        .title-cell {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .price {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--accent);
+            text-align: right;
+        }
+
+        tr {
+            transition: all 0.3s ease;
+        }
+
+        tr:hover {
+            background: rgba(0, 255, 157, 0.08);
+            transform: translateX(8px);
+        }
+
+        /* Empty State */
+        .empty {
+            padding: 120px 40px;
+            text-align: center;
+        }
+
+        .empty h2 {
+            font-size: 32px;
+            margin-bottom: 12px;
+            color: var(--text-muted);
+        }
+
+        .empty p {
+            color: #555;
+            font-size: 15px;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 80px;
+            text-align: center;
+            font-size: 13px;
+            color: #444;
+        }
+
+        /* Glow effects */
+        .glow {
+            text-shadow: 0 0 20px rgba(0, 255, 157, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header>
+        <div>
+            <div class="logo glow">shelf</div>
+            <div class="subtitle">digital book archive</div>
+        </div>
+        <div class="stats">
+            <div>{{ books|length if books else '0' }} books collected</div>
+            <div>last scanned • just now</div>
+        </div>
+    </header>
+
+    <form action="/scrape" style="margin-bottom: 40px;">
+        <button type="submit" class="scrape-btn">
+            SCAN NEW BOOKS
+        </button>
+    </form>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th style="text-align: right;">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td class="title-cell">{{ book[0] }}</td>
+                    <td class="price">{{ book[1] }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="2">
+                        <div class="empty">
+                            <h2>No books on the shelf yet</h2>
+                            <p>Click “SCAN NEW BOOKS” to start building your collection</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        shelf • minimal book tracker
+    </footer>
+
+</div>
+
+</body>
+</html>
