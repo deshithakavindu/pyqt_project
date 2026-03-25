@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> shelf • book catalogue</title>
+    <title>shelf • book catalogue</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -12,6 +13,7 @@
             --text: #f0f0f0;
             --text-muted: #888;
             --card: #111;
+            --border: #222;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -23,7 +25,6 @@
             min-height: 100vh;
             padding: 40px 20px;
             line-height: 1.6;
-            overflow-x: hidden;
         }
 
         .container {
@@ -36,14 +37,14 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            margin-bottom: 80px;
-            border-bottom: 1px solid #222;
+            margin-bottom: 60px;
             padding-bottom: 32px;
+            border-bottom: 1px solid var(--border);
         }
 
         .logo {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 42px;
+            font-size: 48px;
             font-weight: 700;
             letter-spacing: -2px;
             background: linear-gradient(90deg, #00ff9d, #00ccff);
@@ -56,6 +57,7 @@
             color: var(--text-muted);
             letter-spacing: 4px;
             text-transform: uppercase;
+            margin-top: 4px;
         }
 
         .stats {
@@ -64,7 +66,15 @@
             color: var(--text-muted);
         }
 
-        /* Scrape Button */
+        /* Controls */
+        .controls {
+            margin-bottom: 32px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+        }
+
         .scrape-btn {
             background: transparent;
             color: var(--accent);
@@ -78,6 +88,7 @@
             transition: all 0.4s ease;
             position: relative;
             overflow: hidden;
+            white-space: nowrap;
         }
 
         .scrape-btn:hover {
@@ -87,18 +98,52 @@
             box-shadow: 0 0 30px rgba(0, 255, 157, 0.6);
         }
 
-        .scrape-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: 0.7s;
+        .search-box {
+            flex: 1;
+            min-width: 280px;
+            padding: 14px 18px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 16px;
+            border-radius: 8px;
         }
 
-        .scrape-btn:hover::before {
-            left: 200%;
+        .search-box:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 255, 157, 0.15);
+        }
+
+        .price-filter {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .price-filter input {
+            width: 110px;
+            padding: 12px 14px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 8px;
+        }
+
+        .price-filter button {
+            padding: 12px 24px;
+            background: #222;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .price-filter button:hover {
+            background: var(--accent);
+            color: #0a0a0a;
         }
 
         /* Table */
@@ -114,10 +159,6 @@
             border-collapse: collapse;
         }
 
-        thead {
-            background: #1a1a1a;
-        }
-
         th {
             padding: 20px 28px;
             text-align: left;
@@ -126,11 +167,12 @@
             letter-spacing: 1.5px;
             color: var(--text-muted);
             text-transform: uppercase;
+            background: #1a1a1a;
         }
 
         td {
             padding: 24px 28px;
-            border-top: 1px solid #222;
+            border-top: 1px solid var(--border);
         }
 
         .title-cell {
@@ -156,7 +198,7 @@
 
         /* Empty State */
         .empty {
-            padding: 120px 40px;
+            padding: 100px 40px;
             text-align: center;
         }
 
@@ -179,7 +221,6 @@
             color: #444;
         }
 
-        /* Glow effects */
         .glow {
             text-shadow: 0 0 20px rgba(0, 255, 157, 0.5);
         }
@@ -200,11 +241,22 @@
         </div>
     </header>
 
-    <form action="/scrape" style="margin-bottom: 40px;">
-        <button type="submit" class="scrape-btn">
-            SCAN NEW BOOKS
-        </button>
-    </form>
+    <!-- Controls -->
+    <div class="controls">
+        <form action="/scrape" style="display: inline;">
+            <button type="submit" class="scrape-btn">SCAN NEW BOOKS</button>
+        </form>
+
+        <input type="text" id="search" class="search-box" placeholder="Search by title...">
+
+        <div class="price-filter">
+            <input type="number" id="min" placeholder="Min £">
+            <input type="number" id="max" placeholder="Max £">
+            <button onclick="filterPrice()">Filter</button>
+        </div>
+
+        <canvas id="priceChart" style="margin-top:40px;"></canvas>
+    </div>
 
     <div class="table-container">
         <table>
@@ -214,7 +266,7 @@
                     <th style="text-align: right;">Price</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="book-table">
                 {% for book in books %}
                 <tr>
                     <td class="title-cell">{{ book[0] }}</td>
@@ -232,6 +284,20 @@
                 {% endfor %}
             </tbody>
         </table>
+
+
+
+        <div style="margin-top:20px;text-align:center;">
+    {% if page > 1 %}
+    <a href="/?page={{ page - 1 }}" style="margin-right:10px;">« Prev</a>
+    {% endif %}
+
+    Page {{ page }} of {{ total_pages }}
+
+    {% if page < total_pages %}
+    <a href="/?page={{ page + 1 }}" style="margin-left:10px;">Next »</a>
+    {% endif %}
+</div>
     </div>
 
     <footer>
@@ -239,6 +305,57 @@
     </footer>
 
 </div>
+
+<script>
+    // Live Search
+    document.getElementById("search").addEventListener("keyup", function() {
+        const value = this.value.toLowerCase().trim();
+        const rows = document.querySelectorAll("#book-table tr");
+
+        rows.forEach(row => {
+            // Skip empty state row
+            if (row.querySelector(".empty")) return;
+
+            const title = row.querySelector(".title-cell").innerText.toLowerCase();
+            row.style.display = title.includes(value) ? "" : "none";
+        });
+    });
+
+    // Price Filter
+    function filterPrice() {
+        const minVal = parseFloat(document.getElementById("min").value) || 0;
+        const maxVal = parseFloat(document.getElementById("max").value) || Infinity;
+
+        const rows = document.querySelectorAll("#book-table tr");
+
+        rows.forEach(row => {
+            // Skip empty state row
+            if (row.querySelector(".empty")) return;
+
+            const priceText = row.querySelector(".price").innerText;
+            // Remove currency symbol and parse number
+            const price = parseFloat(priceText.replace(/[^0-9.]/g, ''));
+
+            if (price >= minVal && price <= maxVal) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
+
+    // Optional: Allow pressing Enter in price fields to filter
+    document.getElementById("min").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") filterPrice();
+    });
+    document.getElementById("max").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") filterPrice();
+    });
+
+
+
+    
+</script>
 
 </body>
 </html>
