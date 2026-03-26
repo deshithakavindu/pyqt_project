@@ -28,10 +28,10 @@ def home():
     )
 
 
-@app.route("/scrape")
-def scrape():
-    books = scrape_books(2)
-    return str(books)
+# @app.route("/scrape")
+# def scrape():
+#     books = scrape_books(2)
+#     return str(books)
 
 if __name__ == "__main__":
     app.run(debug=True)

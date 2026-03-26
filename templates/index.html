@@ -5,15 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shelf • book catalogue</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0a0a0a;
             --accent: #00ff9d;
+            --accent2: #00ccff;
             --text: #f0f0f0;
-            --text-muted: #888;
+            --text-muted: #666;
             --card: #111;
-            --border: #222;
+            --card2: #161616;
+            --border: #1e1e1e;
+            --star-on: #ffd700;
+            --star-off: #333;
+            --fav: #ff4d6d;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -21,263 +26,372 @@
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: 'Inter', sans-serif;
+            font-family: 'DM Mono', monospace;
             min-height: 100vh;
             padding: 40px 20px;
-            line-height: 1.6;
         }
 
-        .container {
-            max-width: 980px;
-            margin: 0 auto;
-        }
+        .container { max-width: 1080px; margin: 0 auto; }
 
-        /* Header */
+        /* ── HEADER ── */
         header {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            margin-bottom: 60px;
-            padding-bottom: 32px;
+            margin-bottom: 48px;
+            padding-bottom: 28px;
             border-bottom: 1px solid var(--border);
         }
 
         .logo {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 48px;
-            font-weight: 700;
-            letter-spacing: -2px;
-            background: linear-gradient(90deg, #00ff9d, #00ccff);
+            font-family: 'Syne', sans-serif;
+            font-size: 52px;
+            font-weight: 800;
+            letter-spacing: -3px;
+            background: linear-gradient(100deg, #00ff9d 0%, #00ccff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            line-height: 1;
         }
 
         .subtitle {
-            font-size: 15px;
+            font-size: 11px;
             color: var(--text-muted);
             letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-top: 6px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 32px;
+            text-align: right;
+        }
+
+        .stat-block { display: flex; flex-direction: column; }
+
+        .stat-val {
+            font-family: 'Syne', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 2px;
             text-transform: uppercase;
             margin-top: 4px;
         }
 
-        .stats {
-            text-align: right;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        /* Controls */
+        /* ── CONTROLS ── */
         .controls {
-            margin-bottom: 32px;
+            margin-bottom: 28px;
             display: flex;
             flex-wrap: wrap;
-            gap: 16px;
+            gap: 12px;
             align-items: center;
         }
 
         .scrape-btn {
             background: transparent;
             color: var(--accent);
-            border: 2px solid var(--accent);
-            padding: 16px 36px;
-            font-size: 13px;
-            font-weight: 600;
+            border: 1.5px solid var(--accent);
+            padding: 14px 28px;
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
             letter-spacing: 2px;
             text-transform: uppercase;
             cursor: pointer;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-            white-space: nowrap;
+            transition: all 0.3s ease;
         }
 
         .scrape-btn:hover {
             background: var(--accent);
             color: #0a0a0a;
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(0, 255, 157, 0.6);
+            box-shadow: 0 0 24px rgba(0,255,157,0.4);
         }
 
         .search-box {
             flex: 1;
-            min-width: 280px;
-            padding: 14px 18px;
+            min-width: 240px;
+            padding: 13px 16px;
             background: var(--card);
             border: 1px solid var(--border);
             color: var(--text);
-            font-size: 16px;
-            border-radius: 8px;
+            font-family: 'DM Mono', monospace;
+            font-size: 14px;
+            border-radius: 6px;
         }
 
         .search-box:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(0, 255, 157, 0.15);
+            box-shadow: 0 0 0 2px rgba(0,255,157,0.12);
         }
 
-        .price-filter {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+        .price-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
         .price-filter input {
-            width: 110px;
-            padding: 12px 14px;
+            width: 100px;
+            padding: 11px 14px;
             background: var(--card);
             border: 1px solid var(--border);
             color: var(--text);
-            border-radius: 8px;
+            font-family: 'DM Mono', monospace;
+            border-radius: 6px;
+            font-size: 13px;
         }
 
-        .price-filter button {
-            padding: 12px 24px;
-            background: #222;
+        .filter-btn {
+            padding: 11px 20px;
+            background: var(--card2);
             color: var(--accent);
-            border: 1px solid var(--accent);
-            border-radius: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
             cursor: pointer;
-            font-weight: 500;
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            transition: all 0.2s;
         }
 
-        .price-filter button:hover {
-            background: var(--accent);
-            color: #0a0a0a;
+        .filter-btn:hover { border-color: var(--accent); }
+
+        .fav-toggle {
+            padding: 11px 18px;
+            background: var(--card2);
+            color: var(--fav);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            transition: all 0.2s;
+            letter-spacing: 1px;
         }
 
-        /* Table */
+        .fav-toggle.active {
+            background: rgba(255,77,109,0.1);
+            border-color: var(--fav);
+        }
+
+        /* ── ANALYTICS PANEL ── */
+        .analytics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .chart-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .chart-title {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        /* ── TABLE ── */
         .table-container {
             background: var(--card);
-            border-radius: 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        table { width: 100%; border-collapse: collapse; }
 
         th {
-            padding: 20px 28px;
+            padding: 16px 24px;
             text-align: left;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 500;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
             color: var(--text-muted);
             text-transform: uppercase;
-            background: #1a1a1a;
+            background: #141414;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
         }
 
-        td {
-            padding: 24px 28px;
-            border-top: 1px solid var(--border);
-        }
+        th:hover { color: var(--accent); }
 
-        .title-cell {
-            font-size: 18px;
-            font-weight: 500;
-        }
+        td { padding: 18px 24px; border-top: 1px solid var(--border); vertical-align: middle; }
+
+        .title-cell { font-size: 15px; font-weight: 400; }
 
         .price {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 500;
             color: var(--accent);
             text-align: right;
+            white-space: nowrap;
         }
 
-        tr {
-            transition: all 0.3s ease;
+        tr { transition: background 0.2s; }
+        tr:hover { background: rgba(0,255,157,0.04); }
+
+        /* ── FAV BUTTON ── */
+        .fav-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 1;
+            transition: transform 0.2s;
+            padding: 2px 4px;
         }
 
-        tr:hover {
-            background: rgba(0, 255, 157, 0.08);
-            transform: translateX(8px);
+        .fav-btn:hover { transform: scale(1.3); }
+        .fav-btn.faved { filter: drop-shadow(0 0 6px rgba(255,77,109,0.7)); }
+
+        /* ── STAR RATING ── */
+        .stars {
+            display: flex;
+            gap: 2px;
+            justify-content: center;
         }
 
-        /* Empty State */
-        .empty {
-            padding: 100px 40px;
-            text-align: center;
+        .star {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--star-off);
+            transition: all 0.15s;
+            line-height: 1;
+            padding: 1px;
         }
 
-        .empty h2 {
-            font-size: 32px;
-            margin-bottom: 12px;
-            color: var(--text-muted);
-        }
+        .star.lit { color: var(--star-on); }
+        .star:hover { transform: scale(1.25); }
 
-        .empty p {
-            color: #555;
-            font-size: 15px;
-        }
+        /* ── EMPTY STATE ── */
+        .empty { padding: 80px 40px; text-align: center; }
+        .empty h2 { font-size: 24px; margin-bottom: 10px; color: var(--text-muted); font-family: 'Syne', sans-serif; }
+        .empty p { color: #444; font-size: 13px; }
 
-        /* Footer */
         footer {
-            margin-top: 80px;
+            margin-top: 64px;
             text-align: center;
-            font-size: 13px;
-            color: #444;
+            font-size: 11px;
+            color: #333;
+            letter-spacing: 2px;
         }
 
-        .glow {
-            text-shadow: 0 0 20px rgba(0, 255, 157, 0.5);
+        @media (max-width: 680px) {
+            .analytics { grid-template-columns: 1fr; }
+            .header-stats { gap: 16px; }
+            .stat-val { font-size: 20px; }
         }
     </style>
 </head>
 <body>
-
 <div class="container">
 
+    <!-- HEADER -->
     <header>
         <div>
-            <div class="logo glow">shelf</div>
+            <div class="logo">shelf</div>
             <div class="subtitle">digital book archive</div>
         </div>
-        <div class="stats">
-            <div>{{ books|length if books else '0' }} books collected</div>
-            <div>last scanned • just now</div>
+        <div class="header-stats">
+            <div class="stat-block">
+                <span class="stat-val" id="stat-count">0</span>
+                <span class="stat-label">books</span>
+            </div>
+            <div class="stat-block">
+                <span class="stat-val" id="stat-avg">—</span>
+                <span class="stat-label">avg price</span>
+            </div>
+            <div class="stat-block">
+                <span class="stat-val" id="stat-total">—</span>
+                <span class="stat-label">total value</span>
+            </div>
+            <div class="stat-block">
+                <span class="stat-val" id="stat-favs">0</span>
+                <span class="stat-label">favourites</span>
+            </div>
         </div>
     </header>
 
-    <!-- Controls -->
+    <!-- CONTROLS -->
     <div class="controls">
-        <form action="/scrape" style="display: inline;">
-            <button type="submit" class="scrape-btn">SCAN NEW BOOKS</button>
+        <form action="/" style="display:inline;">
+            <button type="submit" class="scrape-btn">⟳ Scan New Books</button>
         </form>
-
-        <input type="text" id="search" class="search-box" placeholder="Search by title...">
-
+        <input type="text" id="search" class="search-box" placeholder="Search by title…">
         <div class="price-filter">
             <input type="number" id="min" placeholder="Min £">
             <input type="number" id="max" placeholder="Max £">
-            <button onclick="filterPrice()">Filter</button>
+            <button class="filter-btn" onclick="filterPrice()">Filter</button>
+            <button class="filter-btn" onclick="clearFilter()">Clear</button>
         </div>
-
-        <canvas id="priceChart" style="margin-top:40px;"></canvas>
+        <button class="fav-toggle" id="favToggle" onclick="toggleFavFilter()">♥ Favourites only</button>
     </div>
 
+    <!-- ANALYTICS -->
+    <div class="analytics">
+        <div class="chart-card">
+            <div class="chart-title">Price Distribution</div>
+            <canvas id="priceChart" height="160"></canvas>
+        </div>
+        <div class="chart-card">
+            <div class="chart-title">Ratings Overview</div>
+            <canvas id="ratingChart" height="160"></canvas>
+        </div>
+    </div>
+
+    <!-- TABLE -->
     <div class="table-container">
         <table>
             <thead>
                 <tr>
-                    <th>Title</th>
-                    <th style="text-align: right;">Price</th>
+                    <th style="width:48px;"></th>
+                    <th onclick="sortBy('title')">Title ↕</th>
+                    <th onclick="sortBy('rating')" style="text-align:center;">Rating ↕</th>
+                    <th onclick="sortBy('price')" style="text-align:right;">Price ↕</th>
                 </tr>
             </thead>
             <tbody id="book-table">
                 {% for book in books %}
-                <tr>
+                <tr
+                    data-title="{{ book[0] }}"
+                    data-price="{{ book[1]|replace('£','') }}"
+                    data-id="{{ loop.index }}"
+                >
+                    <td>
+                        <button class="fav-btn" onclick="toggleFav(this)" title="Favourite">♡</button>
+                    </td>
                     <td class="title-cell">{{ book[0] }}</td>
+                    <td style="text-align:center;">
+                        <div class="stars">
+                            <button class="star" onclick="setRating(this,1)">★</button>
+                            <button class="star" onclick="setRating(this,2)">★</button>
+                            <button class="star" onclick="setRating(this,3)">★</button>
+                            <button class="star" onclick="setRating(this,4)">★</button>
+                            <button class="star" onclick="setRating(this,5)">★</button>
+                        </div>
+                    </td>
                     <td class="price">{{ book[1] }}</td>
                 </tr>
                 {% else %}
-                <tr>
-                    <td colspan="2">
+                <tr id="empty-row">
+                    <td colspan="4">
                         <div class="empty">
                             <h2>No books on the shelf yet</h2>
-                            <p>Click “SCAN NEW BOOKS” to start building your collection</p>
+                            <p>Click "Scan New Books" to start building your collection</p>
                         </div>
                     </td>
                 </tr>
@@ -285,77 +399,253 @@
             </tbody>
         </table>
 
-
-
-        <div style="margin-top:20px;text-align:center;">
-    {% if page > 1 %}
-    <a href="/?page={{ page - 1 }}" style="margin-right:10px;">« Prev</a>
-    {% endif %}
-
-    Page {{ page }} of {{ total_pages }}
-
-    {% if page < total_pages %}
-    <a href="/?page={{ page + 1 }}" style="margin-left:10px;">Next »</a>
-    {% endif %}
-</div>
+        <div style="margin:20px;text-align:center;font-size:13px;color:var(--text-muted);">
+            {% if page > 1 %}
+            <a href="/?page={{ page - 1 }}" style="margin-right:14px;color:var(--accent);text-decoration:none;">« Prev</a>
+            {% endif %}
+            Page {{ page }} of {{ total_pages }}
+            {% if page < total_pages %}
+            <a href="/?page={{ page + 1 }}" style="margin-left:14px;color:var(--accent);text-decoration:none;">Next »</a>
+            {% endif %}
+        </div>
     </div>
 
-    <footer>
-        shelf • minimal book tracker
-    </footer>
-
+    <footer>shelf • minimal book tracker</footer>
 </div>
 
 <script>
-    // Live Search
-    document.getElementById("search").addEventListener("keyup", function() {
-        const value = this.value.toLowerCase().trim();
-        const rows = document.querySelectorAll("#book-table tr");
+// ── STATE ──────────────────────────────────────────────────────────
+const favs     = JSON.parse(localStorage.getItem('shelf_favs')  || '{}');
+const ratings  = JSON.parse(localStorage.getItem('shelf_ratings')|| '{}');
+let showFavsOnly = false;
+let sortField    = null;
+let sortDir      = 1;
 
-        rows.forEach(row => {
-            // Skip empty state row
-            if (row.querySelector(".empty")) return;
+// ── INIT ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    restoreFavs();
+    restoreRatings();
+    updateStats();
+    drawCharts();
+});
 
-            const title = row.querySelector(".title-cell").innerText.toLowerCase();
-            row.style.display = title.includes(value) ? "" : "none";
+// ── FAV HELPERS ───────────────────────────────────────────────────
+function getRowId(btn) {
+    return btn.closest('tr').dataset.id;
+}
+
+function toggleFav(btn) {
+    const id = getRowId(btn);
+    favs[id] = !favs[id];
+    localStorage.setItem('shelf_favs', JSON.stringify(favs));
+    applyFavStyle(btn, favs[id]);
+    updateStats();
+    drawCharts();
+}
+
+function applyFavStyle(btn, isFav) {
+    btn.textContent = isFav ? '♥' : '♡';
+    btn.classList.toggle('faved', isFav);
+    btn.style.color = isFav ? 'var(--fav)' : '';
+}
+
+function restoreFavs() {
+    document.querySelectorAll('.fav-btn').forEach(btn => {
+        const id = getRowId(btn);
+        if (favs[id]) applyFavStyle(btn, true);
+    });
+}
+
+function toggleFavFilter() {
+    showFavsOnly = !showFavsOnly;
+    document.getElementById('favToggle').classList.toggle('active', showFavsOnly);
+    applyVisibility();
+}
+
+// ── RATING HELPERS ────────────────────────────────────────────────
+function setRating(clickedStar, value) {
+    const row   = clickedStar.closest('tr');
+    const id    = row.dataset.id;
+    const stars = row.querySelectorAll('.star');
+    const current = parseInt(ratings[id] || 0);
+
+    // Click same star = clear rating
+    const newVal = (current === value) ? 0 : value;
+    ratings[id] = newVal;
+    localStorage.setItem('shelf_ratings', JSON.stringify(ratings));
+    renderStars(stars, newVal);
+    drawCharts();
+}
+
+function renderStars(stars, value) {
+    stars.forEach((s, i) => s.classList.toggle('lit', i < value));
+}
+
+function restoreRatings() {
+    document.querySelectorAll('tr[data-id]').forEach(row => {
+        const id    = row.dataset.id;
+        const stars = row.querySelectorAll('.star');
+        const val   = parseInt(ratings[id] || 0);
+        renderStars(stars, val);
+
+        // Hover preview
+        stars.forEach((star, i) => {
+            star.addEventListener('mouseenter', () => stars.forEach((s, j) => s.style.color = j <= i ? 'var(--star-on)' : ''));
+            star.addEventListener('mouseleave', () => {
+                const cur = parseInt(ratings[id] || 0);
+                stars.forEach((s, j) => s.style.color = '');
+                renderStars(stars, cur);
+            });
         });
     });
+}
 
-    // Price Filter
-    function filterPrice() {
-        const minVal = parseFloat(document.getElementById("min").value) || 0;
-        const maxVal = parseFloat(document.getElementById("max").value) || Infinity;
+// ── STATS ─────────────────────────────────────────────────────────
+function updateStats() {
+    const rows   = [...document.querySelectorAll('tr[data-id]')];
+    const prices = rows.map(r => parseFloat(r.dataset.price) || 0);
+    const total  = prices.reduce((a, b) => a + b, 0);
+    const avg    = prices.length ? (total / prices.length) : 0;
+    const favCount = Object.values(favs).filter(Boolean).length;
 
-        const rows = document.querySelectorAll("#book-table tr");
+    document.getElementById('stat-count').textContent = rows.length;
+    document.getElementById('stat-avg').textContent   = rows.length ? '£' + avg.toFixed(2)   : '—';
+    document.getElementById('stat-total').textContent = rows.length ? '£' + total.toFixed(2) : '—';
+    document.getElementById('stat-favs').textContent  = favCount;
+}
 
-        rows.forEach(row => {
-            // Skip empty state row
-            if (row.querySelector(".empty")) return;
+// ── CHARTS ────────────────────────────────────────────────────────
+let priceChartInst = null;
+let ratingChartInst = null;
 
-            const priceText = row.querySelector(".price").innerText;
-            // Remove currency symbol and parse number
-            const price = parseFloat(priceText.replace(/[^0-9.]/g, ''));
+function drawCharts() {
+    const rows   = [...document.querySelectorAll('tr[data-id]')];
+    const prices = rows.map(r => parseFloat(r.dataset.price) || 0);
 
-            if (price >= minVal && price <= maxVal) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
-        });
-    }
-
-    // Optional: Allow pressing Enter in price fields to filter
-    document.getElementById("min").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") filterPrice();
+    // Price distribution buckets
+    const buckets = { '£0–5': 0, '£5–10': 0, '£10–20': 0, '£20–40': 0, '£40+': 0 };
+    prices.forEach(p => {
+        if (p < 5)       buckets['£0–5']++;
+        else if (p < 10) buckets['£5–10']++;
+        else if (p < 20) buckets['£10–20']++;
+        else if (p < 40) buckets['£20–40']++;
+        else             buckets['£40+']++;
     });
-    document.getElementById("max").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") filterPrice();
+
+    const chartDefaults = {
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { ticks: { color: '#666', font: { family: 'DM Mono', size: 11 } }, grid: { color: '#1e1e1e' } },
+            y: { ticks: { color: '#666', font: { family: 'DM Mono', size: 11 } }, grid: { color: '#1e1e1e' }, beginAtZero: true }
+        }
+    };
+
+    // Price chart
+    if (priceChartInst) priceChartInst.destroy();
+    priceChartInst = new Chart(document.getElementById('priceChart'), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(buckets),
+            datasets: [{
+                data: Object.values(buckets),
+                backgroundColor: 'rgba(0,255,157,0.25)',
+                borderColor: '#00ff9d',
+                borderWidth: 1.5,
+                borderRadius: 4,
+            }]
+        },
+        options: { ...chartDefaults, animation: { duration: 600 } }
     });
 
+    // Rating distribution
+    const ratingBuckets = [0, 0, 0, 0, 0]; // index = star-1
+    rows.forEach(r => {
+        const val = parseInt(ratings[r.dataset.id] || 0);
+        if (val >= 1 && val <= 5) ratingBuckets[val - 1]++;
+    });
 
+    if (ratingChartInst) ratingChartInst.destroy();
+    ratingChartInst = new Chart(document.getElementById('ratingChart'), {
+        type: 'bar',
+        data: {
+            labels: ['★1', '★2', '★3', '★4', '★5'],
+            datasets: [{
+                data: ratingBuckets,
+                backgroundColor: 'rgba(255,215,0,0.2)',
+                borderColor: '#ffd700',
+                borderWidth: 1.5,
+                borderRadius: 4,
+            }]
+        },
+        options: { ...chartDefaults, animation: { duration: 600 } }
+    });
+}
 
-    
+// ── SEARCH ───────────────────────────────────────────────────────
+document.getElementById('search').addEventListener('keyup', applyVisibility);
+
+// ── PRICE FILTER ─────────────────────────────────────────────────
+let priceMin = 0, priceMax = Infinity;
+
+function filterPrice() {
+    priceMin = parseFloat(document.getElementById('min').value) || 0;
+    priceMax = parseFloat(document.getElementById('max').value) || Infinity;
+    applyVisibility();
+}
+
+function clearFilter() {
+    document.getElementById('min').value = '';
+    document.getElementById('max').value = '';
+    priceMin = 0; priceMax = Infinity;
+    applyVisibility();
+}
+
+document.getElementById('min').addEventListener('keypress', e => { if (e.key === 'Enter') filterPrice(); });
+document.getElementById('max').addEventListener('keypress', e => { if (e.key === 'Enter') filterPrice(); });
+
+// ── SORT ─────────────────────────────────────────────────────────
+function sortBy(field) {
+    if (sortField === field) sortDir *= -1;
+    else { sortField = field; sortDir = 1; }
+
+    const tbody = document.getElementById('book-table');
+    const rows  = [...tbody.querySelectorAll('tr[data-id]')];
+
+    rows.sort((a, b) => {
+        if (field === 'price') {
+            return (parseFloat(a.dataset.price) - parseFloat(b.dataset.price)) * sortDir;
+        }
+        if (field === 'title') {
+            return a.dataset.title.localeCompare(b.dataset.title) * sortDir;
+        }
+        if (field === 'rating') {
+            const ra = parseInt(ratings[a.dataset.id] || 0);
+            const rb = parseInt(ratings[b.dataset.id] || 0);
+            return (ra - rb) * sortDir;
+        }
+        return 0;
+    });
+
+    rows.forEach(r => tbody.appendChild(r));
+}
+
+// ── VISIBILITY (search + price + favs) ───────────────────────────
+function applyVisibility() {
+    const query = document.getElementById('search').value.toLowerCase().trim();
+
+    document.querySelectorAll('tr[data-id]').forEach(row => {
+        const title    = row.dataset.title.toLowerCase();
+        const price    = parseFloat(row.dataset.price) || 0;
+        const id       = row.dataset.id;
+        const isFav    = !!favs[id];
+
+        const matchTitle = title.includes(query);
+        const matchPrice = price >= priceMin && price <= priceMax;
+        const matchFav   = !showFavsOnly || isFav;
+
+        row.style.display = (matchTitle && matchPrice && matchFav) ? '' : 'none';
+    });
+}
 </script>
-
 </body>
 </html>
