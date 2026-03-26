@@ -1,24 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shelf • book catalogue</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0a0a0a;
             --accent: #00ff9d;
-            --accent2: #00ccff;
             --text: #f0f0f0;
-            --text-muted: #666;
+            --text-muted: #888;
             --card: #111;
-            --card2: #161616;
-            --border: #1e1e1e;
-            --star-on: #ffd700;
-            --star-off: #333;
-            --fav: #ff4d6d;
+            --border: #222;
+            --toggle-bg: #1a1a1a;
+        }
+
+        [data-theme="light"] {
+            --bg: #f5f5f0;
+            --accent: #00b86e;
+            --text: #111111;
+            --text-muted: #666;
+            --card: #ffffff;
+            --border: #e0e0e0;
+            --toggle-bg: #e8e8e8;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -26,372 +32,330 @@
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: 'DM Mono', monospace;
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
             padding: 40px 20px;
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
         }
 
-        .container { max-width: 1080px; margin: 0 auto; }
+        .container { max-width: 980px; margin: 0 auto; }
 
-        /* ── HEADER ── */
+        /* Header */
         header {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            margin-bottom: 48px;
-            padding-bottom: 28px;
+            margin-bottom: 60px;
+            padding-bottom: 32px;
             border-bottom: 1px solid var(--border);
         }
 
         .logo {
-            font-family: 'Syne', sans-serif;
-            font-size: 52px;
-            font-weight: 800;
-            letter-spacing: -3px;
-            background: linear-gradient(100deg, #00ff9d 0%, #00ccff 100%);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            background: linear-gradient(90deg, #00ff9d, #00ccff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            line-height: 1;
         }
 
         .subtitle {
-            font-size: 11px;
+            font-size: 15px;
             color: var(--text-muted);
             letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-top: 6px;
-        }
-
-        .header-stats {
-            display: flex;
-            gap: 32px;
-            text-align: right;
-        }
-
-        .stat-block { display: flex; flex-direction: column; }
-
-        .stat-val {
-            font-family: 'Syne', sans-serif;
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--accent);
-            line-height: 1;
-        }
-
-        .stat-label {
-            font-size: 10px;
-            color: var(--text-muted);
-            letter-spacing: 2px;
             text-transform: uppercase;
             margin-top: 4px;
         }
 
-        /* ── CONTROLS ── */
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 12px;
+        }
+
+        .stats {
+            text-align: right;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            background: var(--toggle-bg);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 6px 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* Controls */
         .controls {
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 16px;
             align-items: center;
         }
 
         .scrape-btn {
             background: transparent;
             color: var(--accent);
-            border: 1.5px solid var(--accent);
-            padding: 14px 28px;
-            font-family: 'DM Mono', monospace;
-            font-size: 11px;
-            font-weight: 500;
+            border: 2px solid var(--accent);
+            padding: 16px 36px;
+            font-size: 13px;
+            font-weight: 600;
             letter-spacing: 2px;
             text-transform: uppercase;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            white-space: nowrap;
         }
 
         .scrape-btn:hover {
             background: var(--accent);
             color: #0a0a0a;
-            box-shadow: 0 0 24px rgba(0,255,157,0.4);
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 255, 157, 0.6);
         }
 
         .search-box {
             flex: 1;
-            min-width: 240px;
-            padding: 13px 16px;
+            min-width: 280px;
+            padding: 14px 18px;
             background: var(--card);
             border: 1px solid var(--border);
             color: var(--text);
-            font-family: 'DM Mono', monospace;
-            font-size: 14px;
-            border-radius: 6px;
+            font-size: 16px;
+            border-radius: 8px;
+            transition: background 0.3s;
         }
 
         .search-box:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(0,255,157,0.12);
+            box-shadow: 0 0 0 3px rgba(0, 255, 157, 0.15);
         }
 
-        .price-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .price-filter { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 
         .price-filter input {
-            width: 100px;
-            padding: 11px 14px;
+            width: 110px;
+            padding: 12px 14px;
             background: var(--card);
             border: 1px solid var(--border);
             color: var(--text);
-            font-family: 'DM Mono', monospace;
-            border-radius: 6px;
-            font-size: 13px;
+            border-radius: 8px;
+            transition: background 0.3s;
         }
 
-        .filter-btn {
-            padding: 11px 20px;
-            background: var(--card2);
+        .price-filter button {
+            padding: 12px 24px;
+            background: var(--toggle-bg);
             color: var(--accent);
-            border: 1px solid var(--border);
-            border-radius: 6px;
+            border: 1px solid var(--accent);
+            border-radius: 8px;
             cursor: pointer;
-            font-family: 'DM Mono', monospace;
-            font-size: 12px;
+            font-weight: 500;
             transition: all 0.2s;
         }
 
-        .filter-btn:hover { border-color: var(--accent); }
+        .price-filter button:hover { background: var(--accent); color: #0a0a0a; }
 
-        .fav-toggle {
-            padding: 11px 18px;
-            background: var(--card2);
-            color: var(--fav);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'DM Mono', monospace;
-            font-size: 12px;
-            transition: all 0.2s;
-            letter-spacing: 1px;
-        }
-
-        .fav-toggle.active {
-            background: rgba(255,77,109,0.1);
-            border-color: var(--fav);
-        }
-
-        /* ── ANALYTICS PANEL ── */
-        .analytics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
+        /* Status filter tabs */
+        .status-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
             margin-bottom: 28px;
         }
 
-        .chart-card {
-            background: var(--card);
+        .status-tab {
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 24px;
-        }
-
-        .chart-title {
-            font-size: 10px;
+            background: var(--card);
             color: var(--text-muted);
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
-            margin-bottom: 18px;
+            transition: all 0.2s;
         }
 
-        /* ── TABLE ── */
+        .status-tab:hover { border-color: var(--accent); color: var(--accent); }
+        .status-tab.active { background: var(--accent); color: #0a0a0a; border-color: var(--accent); font-weight: 600; }
+
+        /* Table */
         .table-container {
             background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            transition: background 0.3s;
         }
 
         table { width: 100%; border-collapse: collapse; }
 
         th {
-            padding: 16px 24px;
+            padding: 20px 28px;
             text-align: left;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 500;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             color: var(--text-muted);
             text-transform: uppercase;
-            background: #141414;
-            cursor: pointer;
-            user-select: none;
-            transition: color 0.2s;
+            background: var(--toggle-bg);
+            transition: background 0.3s;
         }
 
-        th:hover { color: var(--accent); }
+        td { padding: 22px 28px; border-top: 1px solid var(--border); vertical-align: middle; }
 
-        td { padding: 18px 24px; border-top: 1px solid var(--border); vertical-align: middle; }
-
-        .title-cell { font-size: 15px; font-weight: 400; }
+        .title-cell { font-size: 18px; font-weight: 500; }
 
         .price {
-            font-size: 15px;
-            font-weight: 500;
+            font-size: 18px;
+            font-weight: 600;
             color: var(--accent);
             text-align: right;
             white-space: nowrap;
         }
 
-        tr { transition: background 0.2s; }
-        tr:hover { background: rgba(0,255,157,0.04); }
+        tr { transition: all 0.3s ease; }
+        tr:hover { background: rgba(0, 255, 157, 0.06); transform: translateX(8px); }
 
-        /* ── FAV BUTTON ── */
-        .fav-btn {
-            background: none;
-            border: none;
+        /* Reading Status Dropdown */
+        .status-select {
+            appearance: none;
+            -webkit-appearance: none;
+            padding: 6px 30px 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 18px;
-            line-height: 1;
-            transition: transform 0.2s;
-            padding: 2px 4px;
+            border: 1.5px solid transparent;
+            transition: all 0.2s;
+            outline: none;
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 9px;
         }
 
-        .fav-btn:hover { transform: scale(1.3); }
-        .fav-btn.faved { filter: drop-shadow(0 0 6px rgba(255,77,109,0.7)); }
-
-        /* ── STAR RATING ── */
-        .stars {
-            display: flex;
-            gap: 2px;
-            justify-content: center;
+        .status-select.want {
+            background-color: rgba(120, 120, 255, 0.15);
+            border-color: rgba(120, 120, 255, 0.45);
+            color: #9999ff;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239999ff'/%3E%3C/svg%3E");
         }
 
-        .star {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            color: var(--star-off);
-            transition: all 0.15s;
-            line-height: 1;
-            padding: 1px;
+        .status-select.reading {
+            background-color: rgba(255, 200, 0, 0.15);
+            border-color: rgba(255, 200, 0, 0.45);
+            color: #ffcc00;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23ffcc00'/%3E%3C/svg%3E");
         }
 
-        .star.lit { color: var(--star-on); }
-        .star:hover { transform: scale(1.25); }
-
-        /* ── EMPTY STATE ── */
-        .empty { padding: 80px 40px; text-align: center; }
-        .empty h2 { font-size: 24px; margin-bottom: 10px; color: var(--text-muted); font-family: 'Syne', sans-serif; }
-        .empty p { color: #444; font-size: 13px; }
-
-        footer {
-            margin-top: 64px;
-            text-align: center;
-            font-size: 11px;
-            color: #333;
-            letter-spacing: 2px;
+        .status-select.done {
+            background-color: rgba(0, 255, 157, 0.12);
+            border-color: rgba(0, 255, 157, 0.4);
+            color: var(--accent);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2300ff9d'/%3E%3C/svg%3E");
         }
 
-        @media (max-width: 680px) {
-            .analytics { grid-template-columns: 1fr; }
-            .header-stats { gap: 16px; }
-            .stat-val { font-size: 20px; }
-        }
+        /* Empty State */
+        .empty { padding: 100px 40px; text-align: center; }
+        .empty h2 { font-size: 32px; margin-bottom: 12px; color: var(--text-muted); }
+        .empty p { color: #555; font-size: 15px; }
+
+        footer { margin-top: 80px; text-align: center; font-size: 13px; color: #444; }
+
+        .glow { text-shadow: 0 0 20px rgba(0, 255, 157, 0.5); }
+
+        .pagination { margin: 20px 28px; font-size: 14px; color: var(--text-muted); }
+        .pagination a { color: var(--accent); text-decoration: none; margin: 0 6px; }
     </style>
 </head>
 <body>
 <div class="container">
 
-    <!-- HEADER -->
     <header>
         <div>
-            <div class="logo">shelf</div>
+            <div class="logo glow">shelf</div>
             <div class="subtitle">digital book archive</div>
         </div>
-        <div class="header-stats">
-            <div class="stat-block">
-                <span class="stat-val" id="stat-count">0</span>
-                <span class="stat-label">books</span>
+        <div class="header-right">
+            <div class="theme-toggle" onclick="toggleTheme()">
+                <span id="themeIcon">🌙</span>
+                <span id="themeLabel">Dark mode</span>
             </div>
-            <div class="stat-block">
-                <span class="stat-val" id="stat-avg">—</span>
-                <span class="stat-label">avg price</span>
-            </div>
-            <div class="stat-block">
-                <span class="stat-val" id="stat-total">—</span>
-                <span class="stat-label">total value</span>
-            </div>
-            <div class="stat-block">
-                <span class="stat-val" id="stat-favs">0</span>
-                <span class="stat-label">favourites</span>
+            <div class="stats">
+                <div>{{ books|length if books else '0' }} books collected</div>
+                <div>last scanned • just now</div>
             </div>
         </div>
     </header>
 
-    <!-- CONTROLS -->
+    <!-- Controls -->
     <div class="controls">
-        <form action="/" style="display:inline;">
-            <button type="submit" class="scrape-btn">⟳ Scan New Books</button>
+        <form action="/" style="display: inline;">
+            <button type="submit" class="scrape-btn">SCAN NEW BOOKS</button>
         </form>
-        <input type="text" id="search" class="search-box" placeholder="Search by title…">
+
+        <input type="text" id="search" class="search-box" placeholder="Search by title...">
+
         <div class="price-filter">
             <input type="number" id="min" placeholder="Min £">
             <input type="number" id="max" placeholder="Max £">
-            <button class="filter-btn" onclick="filterPrice()">Filter</button>
-            <button class="filter-btn" onclick="clearFilter()">Clear</button>
-        </div>
-        <button class="fav-toggle" id="favToggle" onclick="toggleFavFilter()">♥ Favourites only</button>
-    </div>
-
-    <!-- ANALYTICS -->
-    <div class="analytics">
-        <div class="chart-card">
-            <div class="chart-title">Price Distribution</div>
-            <canvas id="priceChart" height="160"></canvas>
-        </div>
-        <div class="chart-card">
-            <div class="chart-title">Ratings Overview</div>
-            <canvas id="ratingChart" height="160"></canvas>
+            <button onclick="filterPrice()">Filter</button>
         </div>
     </div>
 
-    <!-- TABLE -->
+    <!-- Status Filter Tabs -->
+    <div class="status-tabs">
+        <div class="status-tab active" onclick="filterStatus('all', this)">All</div>
+        <div class="status-tab" onclick="filterStatus('want', this)">📚 Want to Read</div>
+        <div class="status-tab" onclick="filterStatus('reading', this)">📖 Reading</div>
+        <div class="status-tab" onclick="filterStatus('done', this)">✅ Done</div>
+    </div>
+
     <div class="table-container">
         <table>
             <thead>
                 <tr>
-                    <th style="width:48px;"></th>
-                    <th onclick="sortBy('title')">Title ↕</th>
-                    <th onclick="sortBy('rating')" style="text-align:center;">Rating ↕</th>
-                    <th onclick="sortBy('price')" style="text-align:right;">Price ↕</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Price</th>
                 </tr>
             </thead>
             <tbody id="book-table">
                 {% for book in books %}
-                <tr
-                    data-title="{{ book[0] }}"
-                    data-price="{{ book[1]|replace('£','') }}"
-                    data-id="{{ loop.index }}"
-                >
-                    <td>
-                        <button class="fav-btn" onclick="toggleFav(this)" title="Favourite">♡</button>
-                    </td>
+                <tr data-status="want">
                     <td class="title-cell">{{ book[0] }}</td>
-                    <td style="text-align:center;">
-                        <div class="stars">
-                            <button class="star" onclick="setRating(this,1)">★</button>
-                            <button class="star" onclick="setRating(this,2)">★</button>
-                            <button class="star" onclick="setRating(this,3)">★</button>
-                            <button class="star" onclick="setRating(this,4)">★</button>
-                            <button class="star" onclick="setRating(this,5)">★</button>
-                        </div>
+                    <td>
+                        <select class="status-select want" onchange="updateStatus(this)">
+                            <option value="want" selected>Want to Read</option>
+                            <option value="reading">Reading</option>
+                            <option value="done">Done</option>
+                        </select>
                     </td>
                     <td class="price">{{ book[1] }}</td>
                 </tr>
                 {% else %}
-                <tr id="empty-row">
-                    <td colspan="4">
+                <tr>
+                    <td colspan="3">
                         <div class="empty">
                             <h2>No books on the shelf yet</h2>
-                            <p>Click "Scan New Books" to start building your collection</p>
+                            <p>Click "SCAN NEW BOOKS" to start building your collection</p>
                         </div>
                     </td>
                 </tr>
@@ -399,13 +363,13 @@
             </tbody>
         </table>
 
-        <div style="margin:20px;text-align:center;font-size:13px;color:var(--text-muted);">
+        <div class="pagination">
             {% if page > 1 %}
-            <a href="/?page={{ page - 1 }}" style="margin-right:14px;color:var(--accent);text-decoration:none;">« Prev</a>
+            <a href="/?page={{ page - 1 }}">« Prev</a>
             {% endif %}
             Page {{ page }} of {{ total_pages }}
             {% if page < total_pages %}
-            <a href="/?page={{ page + 1 }}" style="margin-left:14px;color:var(--accent);text-decoration:none;">Next »</a>
+            <a href="/?page={{ page + 1 }}">Next »</a>
             {% endif %}
         </div>
     </div>
@@ -414,238 +378,99 @@
 </div>
 
 <script>
-// ── STATE ──────────────────────────────────────────────────────────
-const favs     = JSON.parse(localStorage.getItem('shelf_favs')  || '{}');
-const ratings  = JSON.parse(localStorage.getItem('shelf_ratings')|| '{}');
-let showFavsOnly = false;
-let sortField    = null;
-let sortDir      = 1;
+    // ── THEME TOGGLE ──────────────────────────────────────────────
+    function toggleTheme() {
+        const html   = document.documentElement;
+        const isDark = html.getAttribute('data-theme') === 'dark';
+        const next   = isDark ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        document.getElementById('themeIcon').textContent  = next === 'light' ? '☀️' : '🌙';
+        document.getElementById('themeLabel').textContent = next === 'light' ? 'Light mode' : 'Dark mode';
+        localStorage.setItem('shelf_theme', next);
+    }
 
-// ── INIT ──────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-    restoreFavs();
-    restoreRatings();
-    updateStats();
-    drawCharts();
-});
+    // Restore saved theme
+    (function () {
+        const saved = localStorage.getItem('shelf_theme');
+        if (saved && saved !== 'dark') {
+            document.documentElement.setAttribute('data-theme', saved);
+            document.getElementById('themeIcon').textContent  = '☀️';
+            document.getElementById('themeLabel').textContent = 'Light mode';
+        }
+    })();
 
-// ── FAV HELPERS ───────────────────────────────────────────────────
-function getRowId(btn) {
-    return btn.closest('tr').dataset.id;
-}
+    // ── READING STATUS ────────────────────────────────────────────
+    function updateStatus(select) {
+        const val = select.value;
+        const row = select.closest('tr');
+        row.dataset.status    = val;
+        select.className      = 'status-select ' + val;
+        const title = row.querySelector('.title-cell').innerText;
+        localStorage.setItem('shelf_s_' + hashTitle(title), val);
+        applyVisibility();
+    }
 
-function toggleFav(btn) {
-    const id = getRowId(btn);
-    favs[id] = !favs[id];
-    localStorage.setItem('shelf_favs', JSON.stringify(favs));
-    applyFavStyle(btn, favs[id]);
-    updateStats();
-    drawCharts();
-}
+    function hashTitle(t) { return btoa(encodeURIComponent(t)).slice(0, 24); }
 
-function applyFavStyle(btn, isFav) {
-    btn.textContent = isFav ? '♥' : '♡';
-    btn.classList.toggle('faved', isFav);
-    btn.style.color = isFav ? 'var(--fav)' : '';
-}
-
-function restoreFavs() {
-    document.querySelectorAll('.fav-btn').forEach(btn => {
-        const id = getRowId(btn);
-        if (favs[id]) applyFavStyle(btn, true);
+    // Restore saved statuses
+    document.querySelectorAll('#book-table tr[data-status]').forEach(row => {
+        const titleEl = row.querySelector('.title-cell');
+        if (!titleEl) return;
+        const saved = localStorage.getItem('shelf_s_' + hashTitle(titleEl.innerText));
+        if (saved) {
+            const sel = row.querySelector('.status-select');
+            sel.value     = saved;
+            sel.className = 'status-select ' + saved;
+            row.dataset.status = saved;
+        }
     });
-}
 
-function toggleFavFilter() {
-    showFavsOnly = !showFavsOnly;
-    document.getElementById('favToggle').classList.toggle('active', showFavsOnly);
-    applyVisibility();
-}
+    // ── STATUS FILTER TABS ────────────────────────────────────────
+    let activeStatus = 'all';
 
-// ── RATING HELPERS ────────────────────────────────────────────────
-function setRating(clickedStar, value) {
-    const row   = clickedStar.closest('tr');
-    const id    = row.dataset.id;
-    const stars = row.querySelectorAll('.star');
-    const current = parseInt(ratings[id] || 0);
+    function filterStatus(status, tab) {
+        activeStatus = status;
+        document.querySelectorAll('.status-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        applyVisibility();
+    }
 
-    // Click same star = clear rating
-    const newVal = (current === value) ? 0 : value;
-    ratings[id] = newVal;
-    localStorage.setItem('shelf_ratings', JSON.stringify(ratings));
-    renderStars(stars, newVal);
-    drawCharts();
-}
+    // ── LIVE SEARCH ───────────────────────────────────────────────
+    document.getElementById('search').addEventListener('keyup', applyVisibility);
 
-function renderStars(stars, value) {
-    stars.forEach((s, i) => s.classList.toggle('lit', i < value));
-}
+    // ── PRICE FILTER ─────────────────────────────────────────────
+    let priceMin = 0, priceMax = Infinity;
 
-function restoreRatings() {
-    document.querySelectorAll('tr[data-id]').forEach(row => {
-        const id    = row.dataset.id;
-        const stars = row.querySelectorAll('.star');
-        const val   = parseInt(ratings[id] || 0);
-        renderStars(stars, val);
+    function filterPrice() {
+        priceMin = parseFloat(document.getElementById('min').value) || 0;
+        priceMax = parseFloat(document.getElementById('max').value) || Infinity;
+        applyVisibility();
+    }
 
-        // Hover preview
-        stars.forEach((star, i) => {
-            star.addEventListener('mouseenter', () => stars.forEach((s, j) => s.style.color = j <= i ? 'var(--star-on)' : ''));
-            star.addEventListener('mouseleave', () => {
-                const cur = parseInt(ratings[id] || 0);
-                stars.forEach((s, j) => s.style.color = '');
-                renderStars(stars, cur);
-            });
+    document.getElementById('min').addEventListener('keypress', e => { if (e.key === 'Enter') filterPrice(); });
+    document.getElementById('max').addEventListener('keypress', e => { if (e.key === 'Enter') filterPrice(); });
+
+    // ── COMBINED VISIBILITY ───────────────────────────────────────
+    function applyVisibility() {
+        const query = document.getElementById('search').value.toLowerCase().trim();
+
+        document.querySelectorAll('#book-table tr').forEach(row => {
+            if (row.querySelector('.empty')) return;
+            const titleEl = row.querySelector('.title-cell');
+            const priceEl = row.querySelector('.price');
+            if (!titleEl || !priceEl) return;
+
+            const title  = titleEl.innerText.toLowerCase();
+            const price  = parseFloat(priceEl.innerText.replace(/[^0-9.]/g, '')) || 0;
+            const status = row.dataset.status || 'want';
+
+            const ok = title.includes(query)
+                    && price >= priceMin && price <= priceMax
+                    && (activeStatus === 'all' || status === activeStatus);
+
+            row.style.display = ok ? '' : 'none';
         });
-    });
-}
-
-// ── STATS ─────────────────────────────────────────────────────────
-function updateStats() {
-    const rows   = [...document.querySelectorAll('tr[data-id]')];
-    const prices = rows.map(r => parseFloat(r.dataset.price) || 0);
-    const total  = prices.reduce((a, b) => a + b, 0);
-    const avg    = prices.length ? (total / prices.length) : 0;
-    const favCount = Object.values(favs).filter(Boolean).length;
-
-    document.getElementById('stat-count').textContent = rows.length;
-    document.getElementById('stat-avg').textContent   = rows.length ? '£' + avg.toFixed(2)   : '—';
-    document.getElementById('stat-total').textContent = rows.length ? '£' + total.toFixed(2) : '—';
-    document.getElementById('stat-favs').textContent  = favCount;
-}
-
-// ── CHARTS ────────────────────────────────────────────────────────
-let priceChartInst = null;
-let ratingChartInst = null;
-
-function drawCharts() {
-    const rows   = [...document.querySelectorAll('tr[data-id]')];
-    const prices = rows.map(r => parseFloat(r.dataset.price) || 0);
-
-    // Price distribution buckets
-    const buckets = { '£0–5': 0, '£5–10': 0, '£10–20': 0, '£20–40': 0, '£40+': 0 };
-    prices.forEach(p => {
-        if (p < 5)       buckets['£0–5']++;
-        else if (p < 10) buckets['£5–10']++;
-        else if (p < 20) buckets['£10–20']++;
-        else if (p < 40) buckets['£20–40']++;
-        else             buckets['£40+']++;
-    });
-
-    const chartDefaults = {
-        plugins: { legend: { display: false } },
-        scales: {
-            x: { ticks: { color: '#666', font: { family: 'DM Mono', size: 11 } }, grid: { color: '#1e1e1e' } },
-            y: { ticks: { color: '#666', font: { family: 'DM Mono', size: 11 } }, grid: { color: '#1e1e1e' }, beginAtZero: true }
-        }
-    };
-
-    // Price chart
-    if (priceChartInst) priceChartInst.destroy();
-    priceChartInst = new Chart(document.getElementById('priceChart'), {
-        type: 'bar',
-        data: {
-            labels: Object.keys(buckets),
-            datasets: [{
-                data: Object.values(buckets),
-                backgroundColor: 'rgba(0,255,157,0.25)',
-                borderColor: '#00ff9d',
-                borderWidth: 1.5,
-                borderRadius: 4,
-            }]
-        },
-        options: { ...chartDefaults, animation: { duration: 600 } }
-    });
-
-    // Rating distribution
-    const ratingBuckets = [0, 0, 0, 0, 0]; // index = star-1
-    rows.forEach(r => {
-        const val = parseInt(ratings[r.dataset.id] || 0);
-        if (val >= 1 && val <= 5) ratingBuckets[val - 1]++;
-    });
-
-    if (ratingChartInst) ratingChartInst.destroy();
-    ratingChartInst = new Chart(document.getElementById('ratingChart'), {
-        type: 'bar',
-        data: {
-            labels: ['★1', '★2', '★3', '★4', '★5'],
-            datasets: [{
-                data: ratingBuckets,
-                backgroundColor: 'rgba(255,215,0,0.2)',
-                borderColor: '#ffd700',
-                borderWidth: 1.5,
-                borderRadius: 4,
-            }]
-        },
-        options: { ...chartDefaults, animation: { duration: 600 } }
-    });
-}
-
-// ── SEARCH ───────────────────────────────────────────────────────
-document.getElementById('search').addEventListener('keyup', applyVisibility);
-
-// ── PRICE FILTER ─────────────────────────────────────────────────
-let priceMin = 0, priceMax = Infinity;
-
-function filterPrice() {
-    priceMin = parseFloat(document.getElementById('min').value) || 0;
-    priceMax = parseFloat(document.getElementById('max').value) || Infinity;
-    applyVisibility();
-}
-
-function clearFilter() {
-    document.getElementById('min').value = '';
-    document.getElementById('max').value = '';
-    priceMin = 0; priceMax = Infinity;
-    applyVisibility();
-}
-
-document.getElementById('min').addEventListener('keypress', e => { if (e.key === 'Enter') filterPrice(); });
-document.getElementById('max').addEventListener('keypress', e => { if (e.key === 'Enter') filterPrice(); });
-
-// ── SORT ─────────────────────────────────────────────────────────
-function sortBy(field) {
-    if (sortField === field) sortDir *= -1;
-    else { sortField = field; sortDir = 1; }
-
-    const tbody = document.getElementById('book-table');
-    const rows  = [...tbody.querySelectorAll('tr[data-id]')];
-
-    rows.sort((a, b) => {
-        if (field === 'price') {
-            return (parseFloat(a.dataset.price) - parseFloat(b.dataset.price)) * sortDir;
-        }
-        if (field === 'title') {
-            return a.dataset.title.localeCompare(b.dataset.title) * sortDir;
-        }
-        if (field === 'rating') {
-            const ra = parseInt(ratings[a.dataset.id] || 0);
-            const rb = parseInt(ratings[b.dataset.id] || 0);
-            return (ra - rb) * sortDir;
-        }
-        return 0;
-    });
-
-    rows.forEach(r => tbody.appendChild(r));
-}
-
-// ── VISIBILITY (search + price + favs) ───────────────────────────
-function applyVisibility() {
-    const query = document.getElementById('search').value.toLowerCase().trim();
-
-    document.querySelectorAll('tr[data-id]').forEach(row => {
-        const title    = row.dataset.title.toLowerCase();
-        const price    = parseFloat(row.dataset.price) || 0;
-        const id       = row.dataset.id;
-        const isFav    = !!favs[id];
-
-        const matchTitle = title.includes(query);
-        const matchPrice = price >= priceMin && price <= priceMax;
-        const matchFav   = !showFavsOnly || isFav;
-
-        row.style.display = (matchTitle && matchPrice && matchFav) ? '' : 'none';
-    });
-}
+    }
 </script>
 </body>
 </html>
